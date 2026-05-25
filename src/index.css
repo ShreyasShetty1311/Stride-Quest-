@@ -1,0 +1,263 @@
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&family=JetBrains+Mono:wght@400;700&family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+  --font-pixel: "Press Start 2P", monospace;
+  --font-pixel-tall: "VT323", monospace;
+  
+  --color-primary: #3f883f;
+  --color-primary-hover: #2c612c;
+  --color-background-dark: #141414;
+  --color-background-light: #f5f6f8;
+  
+  --color-mc-grass: #5dbb63;
+  --color-mc-dirt: #8b5a2b;
+  --color-mc-stone: #7d7d7d;
+  --color-mc-dark: #2e2e2e;
+  --color-mc-light: #c6c6c6;
+  --color-mc-gold: #e1c16e;
+  --color-mc-sky: #87ceeb;
+  --color-mc-red: #ef4444;
+  --color-mc-xp: #55ff55;
+  
+  --color-rival-red: #ef4444;
+  --color-rival-green: #55ff55;
+}
+
+body {
+  @apply bg-background-dark text-slate-200 font-sans antialiased min-h-screen;
+  background-image: 
+    linear-gradient(to right, rgba(255, 255, 255, 0.015) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.015) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+/* Minecraft Panels */
+.mc-panel {
+  background-color: #2e2e2e;
+  border: 4px solid #141414;
+  box-shadow: inset -4px -4px #1c1c1c, inset 4px 4px #4a4a4a;
+}
+
+.mc-panel-light {
+  background-color: #c6c6c6;
+  border: 4px solid #555555;
+  box-shadow: inset -4px -4px #3c3c3c, inset 4px 4px #ffffff;
+}
+
+.mc-slot {
+  background-color: #8b8b8b;
+  border: 2px solid #373737;
+  box-shadow: inset -2px -2px #555555, inset 2px 2px #dbdbdb;
+  image-rendering: pixelated;
+}
+
+.mc-slot-inset {
+  background-color: #1a1a1a;
+  border: 3px solid #555555;
+  box-shadow: inset 3px 3px 0 rgba(0, 0, 0, 0.8), inset -2px -2px 0 rgba(255, 255, 255, 0.05);
+}
+
+.mc-slot-inset-active {
+  background-color: #1a1a1a;
+  border: 3px solid #ffffff;
+  box-shadow: inset 3px 3px 0 rgba(0, 0, 0, 0.8);
+}
+
+/* Minecraft Buttons */
+.mc-btn {
+  background-color: #8b8b8b;
+  border: 2px solid #000000;
+  box-shadow: inset -3px -3px 0 #555555, inset 3px 3px 0 #dbdbdb;
+  image-rendering: pixelated;
+  font-family: 'Press Start 2P', monospace;
+  color: #e0e0e0;
+  text-shadow: 2px 2px 0 #202020;
+  transition: all 0.1s ease;
+}
+
+.mc-btn:hover:not(:disabled) {
+  background-color: #a0a0a0;
+  color: #ffffff;
+  border-color: #000000;
+}
+
+.mc-btn:active:not(:disabled) {
+  box-shadow: inset 3px 3px 0 #555555, inset -3px -3px 0 #dbdbdb;
+  background-color: #707070;
+  padding-top: 2px;
+  padding-left: 2px;
+}
+
+.mc-btn:disabled {
+  background-color: #555555;
+  border-color: #373737;
+  box-shadow: inset -3px -3px 0 #3c3c3c, inset 3px 3px 0 #777777;
+  color: #888888;
+  text-shadow: 2px 2px 0 #111111;
+  cursor: not-allowed;
+}
+
+/* Color variations for buttons */
+.mc-btn-green {
+  background-color: #3f883f;
+  border: 2px solid #000000;
+  box-shadow: inset -3px -3px 0 #204c20, inset 3px 3px 0 #75c175;
+  font-family: 'Press Start 2P', monospace;
+  color: #e0e0e0;
+  text-shadow: 2px 2px 0 #102010;
+}
+
+.mc-btn-green:hover:not(:disabled) {
+  background-color: #4da64d;
+  color: #ffffff;
+}
+
+.mc-btn-green:active:not(:disabled) {
+  box-shadow: inset 3px 3px 0 #204c20, inset -3px -3px 0 #75c175;
+  background-color: #2c612c;
+}
+
+.mc-btn-red {
+  background-color: #b02e2e;
+  border: 2px solid #000000;
+  box-shadow: inset -3px -3px 0 #5c1818, inset 3px 3px 0 #e05e5e;
+  font-family: 'Press Start 2P', monospace;
+  color: #e0e0e0;
+  text-shadow: 2px 2px 0 #200a0a;
+}
+
+.mc-btn-red:hover:not(:disabled) {
+  background-color: #c73c3c;
+  color: #ffffff;
+}
+
+.mc-btn-red:active:not(:disabled) {
+  box-shadow: inset 3px 3px 0 #5c1818, inset -3px -3px 0 #e05e5e;
+  background-color: #8c2424;
+}
+
+.mc-btn-gold {
+  background-color: #bfa02c;
+  border: 2px solid #000000;
+  box-shadow: inset -3px -3px 0 #6e5b15, inset 3px 3px 0 #f0d565;
+  font-family: 'Press Start 2P', monospace;
+  color: #e0e0e0;
+  text-shadow: 2px 2px 0 #2b2306;
+}
+
+.mc-btn-gold:hover:not(:disabled) {
+  background-color: #d6b333;
+  color: #ffffff;
+}
+
+.mc-btn-gold:active:not(:disabled) {
+  box-shadow: inset 3px 3px 0 #6e5b15, inset -3px -3px 0 #f0d565;
+  background-color: #9c8220;
+}
+
+.mc-btn-dark {
+  background-color: #4a4a4a;
+  border: 2px solid #000000;
+  box-shadow: inset -3px -3px 0 #2b2b2b, inset 3px 3px 0 #737373;
+  font-family: 'Press Start 2P', monospace;
+  color: #e0e0e0;
+  text-shadow: 2px 2px 0 #151515;
+}
+
+.mc-btn-dark:hover:not(:disabled) {
+  background-color: #5c5c5c;
+  color: #ffffff;
+}
+
+.mc-btn-dark:active:not(:disabled) {
+  box-shadow: inset 3px 3px 0 #2b2b2b, inset -3px -3px 0 #737373;
+  background-color: #383838;
+}
+
+/* Tooltips */
+.mc-tooltip {
+  background-color: rgba(16, 0, 16, 0.94);
+  border: 2px solid #2e0854;
+  box-shadow: inset 2px 2px 0 #4c0e8c, inset -2px -2px 0 #1a0433;
+  border-radius: 4px;
+}
+
+/* Fonts */
+.font-pixel {
+  font-family: 'Press Start 2P', monospace;
+}
+
+.font-pixel-tall {
+  font-family: 'VT323', monospace;
+}
+
+/* Minecraft-style Scrollbar */
+.mc-scrollbar::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+.mc-scrollbar::-webkit-scrollbar-track {
+  background: #141414;
+  border: 2px solid #555555;
+}
+
+.mc-scrollbar::-webkit-scrollbar-thumb {
+  background: #8b8b8b;
+  border: 2px solid #000000;
+  box-shadow: inset -2px -2px 0 #555555, inset 2px 2px 0 #dbdbdb;
+}
+
+.mc-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #a0a0a0;
+}
+
+.pixelated {
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
+/* Voxel terrain patterns */
+.mc-dirt-pattern {
+  background-color: #8b5a2b;
+  background-image: 
+    radial-gradient(#573d26 25%, transparent 25%), 
+    radial-gradient(#573d26 25%, transparent 25%);
+  background-size: 8px 8px;
+  background-position: 0 0, 4px 4px;
+}
+
+.mc-grass-top {
+  border-top: 8px solid #5dbb63;
+  position: relative;
+}
+
+.mc-grass-top::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background-color: #3f883f;
+}
+
+/* Day/Night transitions */
+.mc-sky-day {
+  background-color: #87ceeb;
+}
+
+.mc-sky-night {
+  background-color: #0b1424;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
