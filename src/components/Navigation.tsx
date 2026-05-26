@@ -8,7 +8,7 @@ interface NavigationProps {
 export function Navigation({ activeTab, onTabChange }: NavigationProps) {
   const navItems = [
     { id: 'dashboard', icon: Zap, label: 'Quest Log' },
-    { id: 'map', icon: MapIcon, label: 'World Map' },
+    { id: 'map', icon: MapIcon, label: 'Arena' },
     { id: 'territory', icon: Shield, label: 'My Sectors' },
     { id: 'leaderboard', icon: Trophy, label: 'Scoreboard' },
     { id: 'profile', icon: User, label: 'Inventory' },

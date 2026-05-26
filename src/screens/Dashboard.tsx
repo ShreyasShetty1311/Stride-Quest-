@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Settings, Bell, Shield, Map as MapIcon, X, User, LogOut, Compass, Clock, Zap, MessageSquare } from 'lucide-react';
+import { Settings, Bell, Shield, Map as MapIcon, Map, X, User, LogOut, Compass, Clock, Zap, MessageSquare } from 'lucide-react';
 import { UserProfile, AlertNotification, DashboardCapture } from '../data/mockDb';
 
 interface DashboardProps {
@@ -148,21 +148,47 @@ export function Dashboard({
 
           {/* Settings Dropdown (Styled as Minecraft Tooltip box) */}
           {activeMenu === 'settings' && (
-            <div className="absolute top-12 right-0 w-56 mc-tooltip shadow-2xl overflow-hidden z-50 p-2 bg-black/95">
+            <div className="absolute top-12 right-0 w-64 mc-tooltip shadow-2xl overflow-hidden z-50 p-2 bg-black/95">
               <div className="flex items-center justify-between pb-2 border-b border-purple-900/50 mb-1">
-                <h3 className="font-pixel text-[10px] text-mc-gold">Settings</h3>
+                <h3 className="font-pixel text-[10px] text-mc-gold">⚙ Command Settings</h3>
                 <button onClick={() => setActiveMenu('none')} className="text-slate-400 hover:text-white cursor-pointer">
                   <X className="w-4 h-4" />
                 </button>
               </div>
-              <div className="flex flex-col gap-1">
+
+              {/* Group: Account */}
+              <p className="font-pixel text-[7px] text-slate-600 uppercase tracking-widest px-2 mt-1 mb-0.5">Account</p>
+              <div className="flex flex-col gap-0.5">
                 <button onClick={() => { setActiveMenu('none'); onNavigate('profile'); }} className="flex items-center gap-3 p-2 text-xs font-pixel text-slate-300 hover:bg-white/10 rounded transition-colors text-left w-full cursor-pointer">
-                  <User className="w-4 h-4 text-mc-gold" /> Profile Setup
+                  <User className="w-4 h-4 text-mc-gold" /> Agent Profile
                 </button>
+                <button onClick={() => { setActiveMenu('none'); onNavigate('profile'); }} className="flex items-center gap-3 p-2 text-xs font-pixel text-slate-300 hover:bg-white/10 rounded transition-colors text-left w-full cursor-pointer">
+                  <Shield className="w-4 h-4 text-mc-sky" /> Change Faction
+                </button>
+              </div>
+
+              {/* Group: Gameplay */}
+              <div className="h-0.5 bg-purple-950/60 my-1.5" />
+              <p className="font-pixel text-[7px] text-slate-600 uppercase tracking-widest px-2 mb-0.5">Gameplay</p>
+              <div className="flex flex-col gap-0.5">
+                <button onClick={() => setActiveMenu('none')} className="flex items-center gap-3 p-2 text-xs font-pixel text-slate-300 hover:bg-white/10 rounded transition-colors text-left w-full cursor-pointer">
+                  <Bell className="w-4 h-4 text-mc-grass" /> Notification Alerts
+                </button>
+                <button onClick={() => setActiveMenu('none')} className="flex items-center gap-3 p-2 text-xs font-pixel text-slate-300 hover:bg-white/10 rounded transition-colors text-left w-full cursor-pointer">
+                  <Zap className="w-4 h-4 text-mc-gold" /> Sound &amp; Haptics
+                </button>
+                <button onClick={() => setActiveMenu('none')} className="flex items-center gap-3 p-2 text-xs font-pixel text-slate-300 hover:bg-white/10 rounded transition-colors text-left w-full cursor-pointer">
+                  <Map className="w-4 h-4 text-mc-sky" /> Map Display Mode
+                </button>
+              </div>
+
+              {/* Group: Support */}
+              <div className="h-0.5 bg-purple-950/60 my-1.5" />
+              <p className="font-pixel text-[7px] text-slate-600 uppercase tracking-widest px-2 mb-0.5">Support</p>
+              <div className="flex flex-col gap-0.5">
                 <button onClick={() => { setActiveMenu('none'); setShowSupportModal(true); }} className="flex items-center gap-3 p-2 text-xs font-pixel text-slate-300 hover:bg-white/10 rounded transition-colors text-left w-full cursor-pointer">
                   <MessageSquare className="w-4 h-4 text-mc-gold" /> Support Beacon
                 </button>
-                <div className="h-0.5 bg-purple-950/80 my-1"></div>
                 <button onClick={() => setActiveMenu('none')} className="flex items-center gap-3 p-2 text-xs font-pixel text-mc-red hover:bg-red-950/20 rounded transition-colors text-left w-full cursor-pointer">
                   <LogOut className="w-4 h-4" /> Disconnect
                 </button>
@@ -213,8 +239,8 @@ export function Dashboard({
         {/* Minecraft Health and Armor HUD Bars */}
         <section className="mc-panel p-4 flex flex-col gap-3 bg-[#2d2d2d] border border-slate-700">
           <h3 className="font-pixel text-[10px] text-slate-400 uppercase tracking-widest mb-1">Survival Status</h3>
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-black/35 p-3 border-2 border-slate-800">
-            {/* Health Bar (Distance metric) */}
+          <div className="flex flex-col gap-4 bg-black/35 p-3 border-2 border-slate-800">
+            {/* Health Bar — Stamina */}
             <div className="flex flex-col gap-1.5">
               <div className="flex items-center justify-between text-xs">
                 <span className="font-pixel text-[9px] text-slate-300">Stamina (Hearts)</span>
@@ -225,9 +251,17 @@ export function Dashboard({
                   <PixelHeart key={i} full={i < user.stats.stamina} />
                 ))}
               </div>
+              {/* Context tooltip */}
+              <p className="font-pixel text-[7px] text-slate-500 leading-relaxed mt-0.5">
+                ❤ Hearts represent your <span className="text-mc-gold">physical stamina</span>. Each quest run
+                restores +2 HP. Fortifying a sector costs 1 HP. At 0 HP you cannot deploy
+                until you complete a recovery run.
+              </p>
             </div>
 
-            {/* Armor Bar (Territory metric) */}
+            <div className="h-px bg-slate-700/60" />
+
+            {/* Armor Bar — Territory Defense */}
             <div className="flex flex-col gap-1.5">
               <div className="flex items-center justify-between text-xs">
                 <span className="font-pixel text-[9px] text-slate-300">Territory (Defense)</span>
@@ -238,6 +272,12 @@ export function Dashboard({
                   <PixelArmor key={i} full={i < user.stats.armor} />
                 ))}
               </div>
+              {/* Context tooltip */}
+              <p className="font-pixel text-[7px] text-slate-500 leading-relaxed mt-0.5">
+                🛡 Armor Points reflect your <span className="text-mc-sky">territory defense strength</span>.
+                Each tile you capture adds +1 AP. Rivals attacking your zones drain AP over time.
+                High AP slows enemy tile decay — defend your turf!
+              </p>
             </div>
           </div>
 

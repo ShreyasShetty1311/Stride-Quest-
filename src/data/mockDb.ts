@@ -211,8 +211,16 @@ export const initialRecentActivity: DashboardCapture[] = [
 ];
 
 export const initialAlerts: AlertNotification[] = [
-  { id: 'alert1', type: 'siege', title: 'Sector Attacked!', message: 'Sunset Heights is under siege. Defend now!', time: '10m ago' },
-  { id: 'alert2', type: 'decay', title: 'Decay Warning', message: 'Ulsoor Lake health is dropping below 65%.', time: '1h ago' },
+  { id: 'alert1', type: 'siege',  title: '⚔ Sector Under Siege!',       message: 'Sunset Heights is under heavy attack by Crimson faction. 3 tiles lost in the last hour. Deploy ASAP!', time: '8m ago' },
+  { id: 'alert2', type: 'decay',  title: '☠ Decay Critical — Ulsoor',   message: 'Ulsoor Lake health has dropped to 22%. No allied runs in 8 days. Territory will fall neutral in ~4h.', time: '34m ago' },
+  { id: 'alert3', type: 'siege',  title: '⚔ Rival Spotted — Jayanagar', message: 'WhitefieldJogger (Gold) is actively capturing tiles near Jayanagar Circle. Sector 7H is contested.', time: '1h ago' },
+  { id: 'alert4', type: 'info',   title: '✅ Conquest Rewarded',          message: 'Your last run at BMSCE perimeter captured 7 tiles and earned +350 XP. Stamina fully restored.', time: '2h ago' },
+  { id: 'alert5', type: 'decay',  title: '⚠ Strength Decaying — 7G',    message: 'Sector 7G (Cubbon Park) strength has dropped to 58%. Run a lap to restore it before rivals move in.', time: '3h ago' },
+  { id: 'alert6', type: 'info',   title: '🏅 New Rank Achieved',          message: 'You climbed to Rank #3 on the Bengaluru local leaderboard! Only 290 tiles behind CubbonParkRacer.', time: '5h ago' },
+  { id: 'alert7', type: 'siege',  title: '🔴 Basavanagudi Contested',    message: 'Cobalt faction has flagged 4 tiles near Bull Temple Road as contested. Hold the line — tiles expire in 2h.', time: '6h ago' },
+  { id: 'alert8', type: 'info',   title: '📡 Support Beacon Answered',   message: 'Allied runner BLR_SprintKing responded to your reinforcement beacon at Sunset Heights. Area defense +20%.', time: '8h ago' },
+  { id: 'alert9', type: 'decay',  title: '☠ RR Nagar Sector Lost',       message: 'RR Nagar Sector Ch.112 has fully decayed to neutral. No allied activity in 12 days. Recapture recommended.', time: '10h ago' },
+  { id: 'alert10', type: 'info',  title: '🎯 Daily Quest Complete',       message: 'You completed today\'s 3km daily quest. Streak: 16 days 🔥 Bonus: +2 HP Stamina restored.', time: '12h ago' },
 ];
 
 export const initialSupportRequests: SupportRequest[] = [

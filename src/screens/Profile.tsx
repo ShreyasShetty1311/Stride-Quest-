@@ -1,6 +1,7 @@
-import { useState, type FormEvent } from 'react';
-import { User, Mail, Shield, Key, X, PenTool, Check, Award, Compass, Clock, Eye, EyeOff, Calendar, Fingerprint, Lock, Footprints, MessageSquare } from 'lucide-react';
+import { useState, useEffect, type FormEvent } from 'react';
+import { User, Mail, Shield, Key, X, PenTool, Check, Award, Compass, Clock, Eye, EyeOff, Calendar, Fingerprint, Lock, Footprints, MessageSquare, Users } from 'lucide-react';
 import type { UserProfile, SupportRequest } from '../data/mockDb';
+import { setLocalFaction, getLocalFaction, FACTION_COLORS, type Faction } from '../engine/perimeterCapture';
 
 interface ProfileProps {
   user: UserProfile;
@@ -27,9 +28,17 @@ export function Profile({ user, supportRequests, onUpdateUser, onAddSupportReque
   const [beaconType, setBeaconType] = useState<'reinforcements' | 'repair' | 'bug_report'>('reinforcements');
   const [beaconDesc, setBeaconDesc] = useState('');
 
+  const [isFactionOpen, setIsFactionOpen] = useState(false);
+
+  // Reactive faction color — drives the bitmoji figurine shirt/arms
+  const [factionColor, setFactionColor] = useState(() => FACTION_COLORS[getLocalFaction()]);
+
   // Interactive state for equipment armor slots
   const [selectedGear, setSelectedGear] = useState<'helmet' | 'chest' | 'legs' | 'boots' | null>(null);
   const [selectedItem, setSelectedItem] = useState<any | null>(null);
+
+  // Hover tooltip for inventory items
+  const [hoveredItem, setHoveredItem] = useState<any | null>(null);
 
   const handleUpdateUsername = (e: FormEvent) => {
     e.preventDefault();
@@ -77,68 +86,52 @@ export function Profile({ user, supportRequests, onUpdateUser, onAddSupportReque
 
       <main className="flex-1 w-full max-w-2xl mx-auto p-4 flex flex-col gap-6">
         
-        {/* Minecraft Character Equipment Layout Panel */}
+        {/* Bitmoji character figurine + character stage */}
         <section className="mc-panel p-4 flex flex-col md:flex-row gap-6 items-center bg-[#2d2d2d] border-2 border-mc-stone">
-          
-          {/* Armor slots columns (Left) */}
-          <div className="flex flex-col gap-2 shrink-0">
-            <span className="font-pixel text-[7px] text-slate-400 text-center uppercase mb-1">Equipment</span>
-            
-            {/* Slot: Helmet */}
-            <button 
-              onClick={() => { setSelectedItem(null); setSelectedGear(selectedGear === 'helmet' ? null : 'helmet'); }}
-              className={`size-12 mc-slot-inset flex items-center justify-center relative group bg-black/40 cursor-pointer ${
-                selectedGear === 'helmet' ? 'border-mc-gold border-2' : ''
-              }`}
-              title={user.gear.helmet.name}
-            >
-              {!user.gear.helmet.unlocked && <Lock className="w-4 h-4 text-slate-700/80 absolute z-0" />}
-              <span className={`text-lg z-10 select-none ${!user.gear.helmet.unlocked ? 'filter brightness-[0.5] saturate-[0.5]' : ''}`}>
-                {user.gear.helmet.emoji}
-              </span>
-            </button>
 
-            {/* Slot: Chestplate */}
-            <button 
-              onClick={() => { setSelectedItem(null); setSelectedGear(selectedGear === 'chest' ? null : 'chest'); }}
-              className={`size-12 mc-slot-inset flex items-center justify-center relative group bg-black/40 cursor-pointer ${
-                selectedGear === 'chest' ? 'border-mc-gold border-2' : ''
-              }`}
-              title={user.gear.chest.name}
+          {/* Single bitmoji figurine (left) */}
+          <div className="flex flex-col items-center gap-2 shrink-0">
+            <span className="font-pixel text-[7px] text-slate-400 uppercase mb-1">Agent</span>
+            {/* Pixel-art standing character */}
+            <svg
+              viewBox="0 0 24 48"
+              width="72"
+              height="144"
+              className="pixelated drop-shadow-[0_4px_12px_rgba(0,0,0,0.8)]"
+              style={{ imageRendering: 'pixelated' }}
             >
-              {!user.gear.chest.unlocked && <Lock className="w-4 h-4 text-slate-700/80 absolute z-0" />}
-              <span className={`text-lg z-10 select-none ${!user.gear.chest.unlocked ? 'filter brightness-[0.5] saturate-[0.5]' : ''}`}>
-                {user.gear.chest.emoji}
-              </span>
-            </button>
-
-            {/* Slot: Leggings */}
-            <button 
-              onClick={() => { setSelectedItem(null); setSelectedGear(selectedGear === 'legs' ? null : 'legs'); }}
-              className={`size-12 mc-slot-inset flex items-center justify-center relative group bg-slate-800 cursor-pointer ${
-                selectedGear === 'legs' ? 'border-mc-gold border-2' : ''
-              }`}
-              title={user.gear.legs.name}
-            >
-              {!user.gear.legs.unlocked && <Lock className="w-4 h-4 text-slate-700/80 absolute z-0" />}
-              <span className={`text-lg z-10 select-none ${!user.gear.legs.unlocked ? 'filter brightness-[0.5] saturate-[0.5]' : ''}`}>
-                {user.gear.legs.emoji}
-              </span>
-            </button>
-
-            {/* Slot: Boots */}
-            <button 
-              onClick={() => { setSelectedItem(null); setSelectedGear(selectedGear === 'boots' ? null : 'boots'); }}
-              className={`size-12 mc-slot-inset-active flex items-center justify-center relative group bg-slate-800 cursor-pointer ${
-                selectedGear === 'boots' ? 'border-mc-gold border-2' : ''
-              }`}
-              title={user.gear.boots.name}
-            >
-              {!user.gear.boots.unlocked && <Lock className="w-4 h-4 text-slate-700/80 absolute z-0" />}
-              <span className={`text-lg z-10 select-none ${user.gear.boots.unlocked ? 'animate-bounce' : 'filter brightness-[0.5] saturate-[0.5]'}`}>
-                {user.gear.boots.emoji}
-              </span>
-            </button>
+              {/* Head */}
+              <rect x="7" y="0" width="10" height="10" rx="1" fill="#f5cba7" />
+              {/* Hair */}
+              <rect x="7" y="0" width="10" height="3" rx="1" fill="#5d4037" />
+              <rect x="7" y="0" width="2" height="5" fill="#5d4037" />
+              {/* Eyes */}
+              <rect x="9" y="4" width="2" height="2" fill="#1a1a1a" />
+              <rect x="13" y="4" width="2" height="2" fill="#1a1a1a" />
+              {/* Mouth */}
+              <rect x="10" y="7" width="4" height="1" fill="#c0392b" />
+              {/* Neck */}
+              <rect x="10" y="10" width="4" height="2" fill="#f5cba7" />
+              {/* Torso — faction colored */}
+              <rect x="6" y="12" width="12" height="12" rx="1" fill={factionColor} />
+              {/* Chest detail */}
+              <rect x="9" y="14" width="6" height="4" rx="0.5" fill="rgba(0,0,0,0.25)" />
+              {/* Left arm */}
+              <rect x="2" y="12" width="4" height="10" rx="1" fill={factionColor} />
+              <rect x="2" y="22" width="4" height="4" rx="1" fill="#f5cba7" />
+              {/* Right arm */}
+              <rect x="18" y="12" width="4" height="10" rx="1" fill={factionColor} />
+              <rect x="18" y="22" width="4" height="4" rx="1" fill="#f5cba7" />
+              {/* Pants */}
+              <rect x="6" y="24" width="5" height="12" rx="1" fill="#2c3e50" />
+              <rect x="13" y="24" width="5" height="12" rx="1" fill="#2c3e50" />
+              {/* Shoes */}
+              <rect x="5" y="36" width="6" height="4" rx="1" fill="#7f5539" />
+              <rect x="13" y="36" width="6" height="4" rx="1" fill="#7f5539" />
+              {/* Shadow */}
+              <ellipse cx="12" cy="42" rx="7" ry="2" fill="rgba(0,0,0,0.25)" />
+            </svg>
+            <p className="font-pixel text-[7px] text-slate-500 text-center mt-1">{user.faction}</p>
           </div>
 
           {/* Center Character Preview Stage */}
@@ -225,6 +218,82 @@ export function Profile({ user, supportRequests, onUpdateUser, onAddSupportReque
           </div>
         </section>
 
+        {/* Faction Allegiance Panel */}
+        <section className="mc-panel p-4 flex flex-col gap-3 bg-[#2d2d2d] border-2 border-mc-stone">
+          <div className="flex items-center justify-between">
+            <h3 className="font-pixel text-[8px] text-slate-400 uppercase tracking-widest px-1">Faction Allegiance</h3>
+            <button
+              onClick={() => setIsFactionOpen(o => !o)}
+              className="mc-btn mc-btn-dark py-1.5 px-3 text-[8px] uppercase cursor-pointer flex items-center gap-1.5"
+            >
+              <Users className="w-3 h-3" /> Change
+            </button>
+          </div>
+
+          {/* Current faction display */}
+          {(() => {
+            const factions: Faction[] = ['Unaffiliated','Crimson','Verdant','Cobalt','Amber'];
+            const factionEmoji: Record<Faction, string> = {
+              Unaffiliated: '⚪', Crimson: '🔴', Verdant: '🟢', Cobalt: '🔵', Amber: '🟡'
+            };
+            const factionDesc: Record<Faction, string> = {
+              Unaffiliated: 'No allegiance. Solo runner.',
+              Crimson: 'Aggressors. Capture first, ask questions later.',
+              Verdant: 'Naturalists. Reclaim green spaces.',
+              Cobalt: 'Tacticians. Precision territory control.',
+              Amber: 'Merchants. Trade routes & supply lines.',
+            };
+            const cur: Faction = (user.faction as Faction) ?? 'Unaffiliated';
+            const col = FACTION_COLORS[cur];
+            return (
+              <div className="flex items-center gap-3 p-3 bg-black/40 border border-slate-700">
+                <div className="size-10 mc-slot-inset flex items-center justify-center text-xl" style={{ borderColor: col }}>
+                  {factionEmoji[cur]}
+                </div>
+                <div>
+                  <p className="font-pixel text-[9px] text-white" style={{ color: col }}>{cur}</p>
+                  <p className="text-[9px] font-pixel-tall text-slate-400 mt-0.5">{factionDesc[cur]}</p>
+                </div>
+              </div>
+            );
+          })()}
+
+          {/* Faction picker (inline) */}
+          {isFactionOpen && (() => {
+            const factions: Faction[] = ['Unaffiliated','Crimson','Verdant','Cobalt','Amber'];
+            const factionEmoji: Record<Faction, string> = {
+              Unaffiliated: '⚪', Crimson: '🔴', Verdant: '🟢', Cobalt: '🔵', Amber: '🟡'
+            };
+            return (
+              <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 mt-1 animate-in slide-in-from-top-1">
+                {factions.map(f => {
+                  const col = FACTION_COLORS[f];
+                  const active = user.faction === f;
+                  return (
+                    <button
+                      key={f}
+                      onClick={() => {
+                        onUpdateUser({ faction: f });
+                        setLocalFaction(f);
+                        setFactionColor(FACTION_COLORS[f]);
+                        setIsFactionOpen(false);
+                      }}
+                      className={`flex flex-col items-center gap-1.5 p-2 border-2 cursor-pointer transition-all ${
+                        active ? 'bg-black/60' : 'bg-black/30 hover:bg-black/50'
+                      }`}
+                      style={{ borderColor: active ? col : 'rgba(255,255,255,0.1)' }}
+                    >
+                      <span className="text-xl">{factionEmoji[f]}</span>
+                      <span className="font-pixel text-[7px]" style={{ color: col }}>{f}</span>
+                      {active && <span className="font-pixel text-[6px] text-mc-xp">ACTIVE</span>}
+                    </button>
+                  );
+                })}
+              </div>
+            );
+          })()}
+        </section>
+
         {/* Action Panel: Credentials and Password Modals */}
         <section className="mc-panel p-4 flex flex-col gap-3 bg-[#2d2d2d] border-2 border-mc-stone">
           <h3 className="font-pixel text-[8px] text-slate-400 uppercase tracking-widest px-1">Security Chest</h3>
@@ -303,25 +372,53 @@ export function Profile({ user, supportRequests, onUpdateUser, onAddSupportReque
             {/* Active Items */}
             {inventoryItems.map((item, index) => {
               const Icon = item.icon;
+              const isHovered = hoveredItem?.name === item.name;
               return (
-                <button 
-                  key={index}
-                  onClick={() => { setSelectedGear(null); setSelectedItem(selectedItem?.name === item.name ? null : item); }}
-                  className={`aspect-square mc-slot-inset flex flex-col items-center justify-center relative group cursor-pointer hover:bg-white/5 bg-black/35 ${
-                    selectedItem?.name === item.name ? 'border-mc-gold border-2' : ''
-                  }`}
-                  title={`${item.name} (${item.desc})`}
-                >
-                  {Icon ? (
-                    <Icon className="w-5 h-5 text-mc-gold" />
-                  ) : (
-                    <span className="text-lg filter drop-shadow-[1px_1px_0_rgba(0,0,0,1)]">{item.emoji}</span>
+                <div key={index} className="relative">
+                  <button 
+                    onMouseEnter={() => setHoveredItem(item)}
+                    onMouseLeave={() => setHoveredItem(null)}
+                    onClick={() => { setSelectedGear(null); setSelectedItem(selectedItem?.name === item.name ? null : item); }}
+                    className={`aspect-square mc-slot-inset flex flex-col items-center justify-center relative group cursor-pointer hover:bg-white/5 bg-black/35 w-full ${
+                      selectedItem?.name === item.name ? 'border-mc-gold border-2' : ''
+                    } ${isHovered ? 'ring-1 ring-mc-gold/60' : ''}`}
+                  >
+                    {Icon ? (
+                      <Icon className="w-5 h-5 text-mc-gold" />
+                    ) : (
+                      <span className="text-lg filter drop-shadow-[1px_1px_0_rgba(0,0,0,1)]">{item.emoji}</span>
+                    )}
+                    {/* Quantity stack count */}
+                    <span className="absolute bottom-0.5 right-1.5 font-pixel text-[8px] text-white drop-shadow-[1.5px_1.5px_0_rgba(0,0,0,1)]">
+                      {item.qty}
+                    </span>
+                  </button>
+
+                  {/* Hover tooltip — Minecraft enchantment table style */}
+                  {isHovered && (
+                    <div className="absolute bottom-[calc(100%+6px)] left-1/2 -translate-x-1/2 z-[999] w-48 pointer-events-none animate-in fade-in duration-100">
+                      <div className="bg-[#100010] border border-purple-800/70 shadow-[0_0_12px_rgba(139,92,246,0.35)] p-2.5 text-left">
+                        {/* Item name */}
+                        <p className="font-pixel text-[9px] text-mc-gold leading-snug mb-1.5">{item.name}</p>
+                        {/* Rarity badge */}
+                        <span className="font-pixel text-[6px] px-1 py-0.5 bg-purple-900/60 text-purple-300 border border-purple-700/40 uppercase tracking-widest">
+                          {item.unlocked ? 'Common' : 'Locked'}
+                        </span>
+                        {/* Divider */}
+                        <div className="h-px bg-purple-900/50 my-2" />
+                        {/* Description */}
+                        <p className="font-pixel text-[7px] text-slate-300 leading-relaxed">{item.desc}</p>
+                        {/* Quantity */}
+                        <div className="mt-2 flex items-center justify-between">
+                          <span className="font-pixel text-[7px] text-slate-500 uppercase">Qty</span>
+                          <span className="font-pixel text-[8px] text-mc-xp">{item.qty}</span>
+                        </div>
+                      </div>
+                      {/* Tooltip arrow */}
+                      <div className="w-2 h-2 bg-[#100010] border-r border-b border-purple-800/70 rotate-45 mx-auto -mt-1" />
+                    </div>
                   )}
-                  {/* Quantity stack count */}
-                  <span className="absolute bottom-0.5 right-1.5 font-pixel text-[8px] text-white drop-shadow-[1.5px_1.5px_0_rgba(0,0,0,1)]">
-                    {item.qty}
-                  </span>
-                </button>
+                </div>
               );
             })}
 

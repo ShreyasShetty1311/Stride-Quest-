@@ -1,5 +1,6 @@
-import { useState } from 'react';
-import { Menu, Trophy, Medal, Gift, Lock, X } from 'lucide-react';
+import React, { useState } from 'react';
+import type { ComponentType } from 'react';
+import { Menu, Trophy, Medal, Gift, Lock, X, Flame, Zap, Star, Shield, MapPin, Wind, Clock, Target } from 'lucide-react';
 
 // Pixel Art Golden Apple Component
 function PixelGoldenApple() {
@@ -22,9 +23,185 @@ function PixelCoal() {
   );
 }
 
+// ────────────────────────────────────────────
+// Advancement data
+// ────────────────────────────────────────────
+
+type AdvStatus = 'unlocked' | 'progress' | 'locked';
+
+interface Adv {
+  name: string;
+  desc: string;
+  status: AdvStatus;
+  icon: ComponentType<{ className?: string }>;
+  color: string;       // icon + border colour
+  bgColor: string;     // card bg
+  progress?: number;   // 0-100 for in-progress
+  progressLabel?: string;
+}
+
+const ADVANCEMENTS: Adv[] = [
+  // ── Unlocked ───────────────────────────────
+  {
+    name: 'Earth Master',
+    desc: 'Top 1% Global Rank',
+    status: 'unlocked',
+    icon: Medal,
+    color: 'text-mc-gold',
+    bgColor: 'bg-[#2d2d2d] border-mc-gold/50',
+  },
+  {
+    name: 'Century Rider',
+    desc: '100 km conquered in a single loop',
+    status: 'unlocked',
+    icon: Trophy,
+    color: 'text-mc-xp',
+    bgColor: 'bg-[#1e2d1e] border-mc-xp/50',
+  },
+  {
+    name: 'First Blood',
+    desc: 'Captured your first territory tile',
+    status: 'unlocked',
+    icon: Flame,
+    color: 'text-mc-red',
+    bgColor: 'bg-[#2d1e1e] border-mc-red/50',
+  },
+  {
+    name: 'Speed Demon',
+    desc: 'Completed a loop in under 10 minutes',
+    status: 'unlocked',
+    icon: Zap,
+    color: 'text-[#a78bfa]',
+    bgColor: 'bg-[#1e1a2d] border-[#a78bfa]/50',
+  },
+  {
+    name: 'Biome Explorer',
+    desc: 'Visited 5 different zone types',
+    status: 'unlocked',
+    icon: MapPin,
+    color: 'text-mc-sky',
+    bgColor: 'bg-[#1a222d] border-mc-sky/50',
+  },
+  // ── In Progress ────────────────────────────
+  {
+    name: 'Night Owl',
+    desc: 'Complete 10 sessions after 10 PM',
+    status: 'progress',
+    icon: Star,
+    color: 'text-mc-gold',
+    bgColor: 'bg-[#2a2416] border-mc-gold/25',
+    progress: 60,
+    progressLabel: '6 / 10 night sessions',
+  },
+  {
+    name: 'Iron Boots',
+    desc: 'Walk 500 km total distance',
+    status: 'progress',
+    icon: Shield,
+    color: 'text-slate-300',
+    bgColor: 'bg-[#222222] border-slate-600/40',
+    progress: 38,
+    progressLabel: '190 / 500 km',
+  },
+  {
+    name: 'Wind Chaser',
+    desc: 'Maintain avg pace under 4:30 /km for 30 min',
+    status: 'progress',
+    icon: Wind,
+    color: 'text-mc-sky',
+    bgColor: 'bg-[#1a222d] border-mc-sky/25',
+    progress: 72,
+    progressLabel: '21 / 30 min sustained',
+  },
+  {
+    name: 'Endurance King',
+    desc: 'Complete 50 active sessions',
+    status: 'progress',
+    icon: Clock,
+    color: 'text-[#fb923c]',
+    bgColor: 'bg-[#2a1f14] border-[#fb923c]/25',
+    progress: 20,
+    progressLabel: '10 / 50 sessions',
+  },
+  // ── Locked ─────────────────────────────────
+  {
+    name: 'Global Conqueror',
+    desc: 'Capture 10,000 km² total territory',
+    status: 'locked',
+    icon: Target,
+    color: 'text-slate-600',
+    bgColor: 'bg-[#1a1a1a] border-slate-800/60',
+  },
+  {
+    name: 'Faction Warlord',
+    desc: 'Lead your faction to #1 in a region',
+    status: 'locked',
+    icon: Shield,
+    color: 'text-slate-600',
+    bgColor: 'bg-[#1a1a1a] border-slate-800/60',
+  },
+  {
+    name: 'Diamond Strider',
+    desc: 'Reach Diamond tier in global rankings',
+    status: 'locked',
+    icon: Star,
+    color: 'text-slate-600',
+    bgColor: 'bg-[#1a1a1a] border-slate-800/60',
+  },
+  {
+    name: 'World Sprinter',
+    desc: 'Log 1,000 km of total movement',
+    status: 'locked',
+    icon: Zap,
+    color: 'text-slate-600',
+    bgColor: 'bg-[#1a1a1a] border-slate-800/60',
+  },
+];
+
+function AdvancementCard({ adv }: { adv: Adv; key?: React.Key }) {
+  const Icon = adv.icon;
+  const isUnlocked = adv.status === 'unlocked';
+  const isProgress = adv.status === 'progress';
+  const isLocked = adv.status === 'locked';
+
+  return (
+    <div className={`mc-panel p-3 border flex items-center gap-4 transition-opacity ${adv.bgColor} ${isLocked ? 'opacity-45' : ''}`}>
+      {/* Icon slot */}
+      <div className={`size-12 shrink-0 mc-slot-inset flex items-center justify-center bg-[#111111] ${isUnlocked || isProgress ? `border ${adv.color.replace('text-', 'border-')}` : ''}`}>
+        {isLocked
+          ? <Lock className="w-6 h-6 text-slate-600" />
+          : <Icon className={`w-6 h-6 ${adv.color}`} />
+        }
+      </div>
+
+      {/* Text + progress */}
+      <div className="flex flex-col gap-0.5 flex-1 min-w-0">
+        <span className={`font-pixel text-[8px] leading-none ${isLocked ? 'text-slate-500' : isProgress ? 'text-mc-sky' : 'text-mc-gold'}`}>
+          {isLocked ? 'Locked Goal' : isProgress ? 'In Progress...' : 'Advancement Made!'}
+        </span>
+        <span className={`font-pixel text-[9px] mt-1 leading-normal ${isLocked ? 'text-slate-400' : 'text-white'}`}>{adv.name}</span>
+        <span className={`text-xs font-mono leading-none ${isLocked ? 'text-slate-500' : 'text-slate-400'}`}>{adv.desc}</span>
+
+        {isProgress && adv.progress !== undefined && (
+          <div className="mt-2">
+            <div className="relative h-2 w-full bg-[#111111] border border-slate-700 overflow-hidden">
+              <div
+                className={`absolute inset-y-0 left-0 transition-all duration-700 ${adv.color.replace('text-', 'bg-')}`}
+                style={{ width: `${adv.progress}%` }}
+              />
+            </div>
+            <span className="font-pixel text-[7px] text-slate-500 mt-0.5 block">{adv.progressLabel} · {adv.progress}%</span>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export function Leaderboard() {
   const [activeTab, setActiveTab] = useState<'global' | 'local'>('global');
   const [showInfo, setShowInfo] = useState(false);
+  const [showAdvancements, setShowAdvancements] = useState(false); // hidden by default
 
   const globalUsers = [
     { rank: 1, name: "RunnerPulse", area: "8,110", loop: "210", tier: "Diamond", img: "https://xsgames.co/randomusers/assets/avatars/male/24.jpg", color: "text-mc-gold" },
@@ -173,49 +350,29 @@ export function Leaderboard() {
 
         {/* Rewards Section styled as Minecraft Advancements */}
         <section className="mt-6 mb-4">
-          <h3 className="font-pixel text-[10px] text-mc-gold uppercase tracking-widest mb-4 flex items-center gap-2">
-            <Gift className="w-4 h-4" />
-            Advancements Unlocked
-          </h3>
-          
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {/* Advancement 1 */}
-            <div className="mc-panel p-3 bg-[#2d2d2d] border border-mc-gold/40 flex items-center gap-4">
-              <div className="size-12 shrink-0 mc-slot-inset border-mc-gold flex items-center justify-center bg-[#1a1a1a]">
-                <Medal className="w-6 h-6 text-mc-gold" />
-              </div>
-              <div className="flex flex-col gap-0.5">
-                <span className="font-pixel text-[8px] text-mc-gold leading-none">Advancement Made!</span>
-                <span className="font-pixel text-[9px] text-white mt-1 leading-normal">Earth Master</span>
-                <span className="text-slate-400 text-xs font-mono">Top 1% Global Rank</span>
-              </div>
+          <button
+            onClick={() => setShowAdvancements(a => !a)}
+            className="w-full flex items-center justify-between mb-3 group"
+          >
+            <h3 className="font-pixel text-[10px] text-mc-gold uppercase tracking-widest flex items-center gap-2">
+              <Gift className="w-4 h-4" />
+              Advancements Unlocked
+              <span className="text-mc-xp text-[8px] ml-1">[{ADVANCEMENTS.filter(a => a.status === 'unlocked').length} / {ADVANCEMENTS.length}]</span>
+            </h3>
+            <span className="font-pixel text-[8px] text-slate-400 group-hover:text-white transition-colors">
+              {showAdvancements ? '▲ HIDE' : '▼ SHOW'}
+            </span>
+          </button>
+
+          {showAdvancements && (
+            <div className="flex flex-col gap-2">
+              {ADVANCEMENTS.map((adv, i) => (
+                <AdvancementCard key={i} adv={adv} />
+              ))}
             </div>
-            
-            {/* Advancement 2 */}
-            <div className="mc-panel p-3 bg-[#2d2d2d] border border-mc-gold/40 flex items-center gap-4">
-              <div className="size-12 shrink-0 mc-slot-inset border-mc-gold flex items-center justify-center bg-[#1a1a1a]">
-                <Trophy className="w-6 h-6 text-mc-xp" />
-              </div>
-              <div className="flex flex-col gap-0.5">
-                <span className="font-pixel text-[8px] text-mc-gold leading-none">Advancement Made!</span>
-                <span className="font-pixel text-[9px] text-white mt-1 leading-normal">Century Rider</span>
-                <span className="text-slate-400 text-xs font-mono">100km Single Loop</span>
-              </div>
-            </div>
-            
-            {/* Locked Advancement */}
-            <div className="mc-panel p-3 bg-[#262626] border border-slate-800 flex items-center gap-4 opacity-55">
-              <div className="size-12 shrink-0 mc-slot-inset flex items-center justify-center bg-[#111111]">
-                <Lock className="w-6 h-6 text-slate-600" />
-              </div>
-              <div className="flex flex-col gap-0.5">
-                <span className="font-pixel text-[8px] text-slate-500 leading-none">Locked Goal</span>
-                <span className="font-pixel text-[9px] text-slate-400 mt-1 leading-normal">Global Conqueror</span>
-                <span className="text-slate-500 text-xs font-mono">Capture 10k km² total</span>
-              </div>
-            </div>
-          </div>
+          )}
         </section>
+
         
       </main>
 

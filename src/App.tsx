@@ -1,5 +1,7 @@
 import { useState } from 'react';
+import { useAuth } from './hooks/useAuth';
 import { Navigation } from './components/Navigation';
+import { LoginScreen } from './screens/LoginScreen';
 import { Dashboard } from './screens/Dashboard';
 import { TacticalMap } from './screens/TacticalMap';
 import { TerritoryView } from './screens/TerritoryView';
@@ -20,8 +22,10 @@ import {
 } from './data/mockDb';
 
 export default function App() {
+  const { userId, isAuthenticated, markAuthenticated, loading } = useAuth();
   const [activeTab, setActiveTab] = useState('dashboard');
   const [isSessionActive, setIsSessionActive] = useState(false);
+  const [deployOrigin, setDeployOrigin] = useState<[number, number]>([12.9406554, 77.5659529]);
 
   // Central Mock Database states
   const [user, setUser] = useState<UserProfile>(initialUser);
@@ -30,38 +34,47 @@ export default function App() {
   const [supportRequests, setSupportRequests] = useState<SupportRequest[]>(initialSupportRequests);
   const [recentActivity, setRecentActivity] = useState<DashboardCapture[]>(initialRecentActivity);
 
-  const startSession = () => setIsSessionActive(true);
+  const startSession = (origin: [number, number]) => {
+    setDeployOrigin(origin);
+    setIsSessionActive(true);
+  };
   
   const stopSession = () => {
     setIsSessionActive(false);
-    // Add completed conquest run activity to logs
+
+    // Read real session results from the territory engine
+    // (session is ended by ActiveSession component — grab last event data)
+    const lastEvents = (window as any).__lastSessionResult as { distanceKm: number; capturedTiles: number } | undefined;
+    const distanceKm = lastEvents?.distanceKm ?? 0.5;
+    const capturedTiles = lastEvents?.capturedTiles ?? 0;
+
     const completedSectorName = activeTab === 'territory' ? 'Sunset Heights' : 'Sector 7-G (Cubbon Park)';
+    const gainText = capturedTiles > 0 ? `+${capturedTiles} tiles` : `+0.5 SQ KM`;
+
     const newLoot: DashboardCapture = {
       name: `${completedSectorName} Circuit`,
-      stats: '1.2 km run • Just now',
-      gain: '+0.5 SQ KM',
+      stats: `${distanceKm.toFixed(2)} km run • Just now`,
+      gain: gainText,
       img: 'https://images.unsplash.com/photo-1502082553048-f009c37129b9?w=120&h=120&fit=crop'
     };
     setRecentActivity(prev => [newLoot, ...prev]);
 
-    // Add alert notification
     const newAlert: AlertNotification = {
       id: `alert-${Date.now()}`,
       type: 'info',
       title: 'Conquest Completed',
-      message: `Completed run at ${completedSectorName}! Area secure.`,
+      message: `Completed run at ${completedSectorName}! ${capturedTiles > 0 ? `${capturedTiles} tiles captured.` : 'Area secure.'}`,
       time: 'Just now'
     };
     setAlerts(prev => [newAlert, ...prev]);
 
-    // Reward user XP and stamina
     setUser(prev => ({
       ...prev,
       level: prev.level + 1,
       stats: {
         ...prev.stats,
-        distance: Number((prev.stats.distance + 1.2).toFixed(1)),
-        capturedArea: Number((prev.stats.capturedArea + 0.5).toFixed(1)),
+        distance: Number((prev.stats.distance + distanceKm).toFixed(1)),
+        capturedArea: Number((prev.stats.capturedArea + capturedTiles * 0.0025).toFixed(3)),
         streak: prev.stats.streak + 1,
         stamina: Math.min(prev.stats.stamina + 2, 10)
       }
@@ -145,6 +158,19 @@ export default function App() {
     setAlerts(prev => prev.filter(al => al.id !== alertId));
   };
 
+  // ── Login gate ────────────────────────────────
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#0a0a0f] flex items-center justify-center">
+        <p className="font-pixel text-[9px] text-mc-gold animate-pulse tracking-widest">BOOTING STRIDE QUEST...</p>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return <LoginScreen onLogin={markAuthenticated} />;
+  }
+
   return (
     <div className="min-h-screen bg-background-dark font-sans text-slate-100 flex flex-col mx-auto w-full">
       {/* Content Area */}
@@ -154,7 +180,7 @@ export default function App() {
             user={user}
             alerts={alerts}
             recentActivity={recentActivity}
-            onStartConquest={startSession} 
+            onStartConquest={() => startSession([12.9406554, 77.5659529])} 
             onNavigate={setActiveTab}
             onAddSupportRequest={handleAddSupportRequest}
             onDeleteAlert={handleDeleteAlert}
@@ -162,14 +188,15 @@ export default function App() {
         )}
         {activeTab === 'map' && (
           <TacticalMap 
-            onDeploy={startSession} 
+            onDeploy={startSession}
+            isSessionActive={isSessionActive}
           />
         )}
         {activeTab === 'territory' && (
           <TerritoryView 
             sectors={sectors}
             stamina={user.stats.stamina}
-            onStartConquest={startSession} 
+            onStartConquest={() => startSession([12.9406554, 77.5659529])} 
             onNavigate={setActiveTab} 
             onFortify={handleFortifySector}
           />
@@ -192,7 +219,7 @@ export default function App() {
 
       {/* Full Screen Modal for Active Session */}
       {isSessionActive && (
-        <ActiveSession onStop={stopSession} />
+        <ActiveSession onStop={stopSession} userId={userId} startOrigin={deployOrigin} />
       )}
     </div>
   );
